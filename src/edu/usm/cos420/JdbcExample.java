@@ -9,9 +9,6 @@ import java.sql.Statement;
 import java.sql.DatabaseMetaData;
 import java.util.Properties;
 
-import com.jcraft.jsch.JSchException;
-
-
 /* 
  * Code to demonstrate creation, deletion of tables. Also, records are inserted. 
  * 
