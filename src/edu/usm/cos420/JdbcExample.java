@@ -36,26 +36,12 @@ public class JdbcExample {
         }
 	}
 	
-	private static SSHTunnel createTunnelFromProperties() throws JSchException
-	{
-        String strSshUser = properties.getProperty("ssh.user");  // SSH login username
-        String strSshPassword = properties.getProperty("ssh.password");                   // SSH login password
-        String strSshHost = properties.getProperty("ssh.host");          // hostname or ip or SSH server
-        String sSshPort = properties.getProperty("ssh.port");  // remote SSH host port number
-        int nSshPort = Integer.parseInt(sSshPort);  // remote SSH host port number
-        String strRemoteHost = properties.getProperty("remote.host");          // hostname or ip of your database server
-        int nLocalPort = Integer.parseInt(properties.getProperty("local.port"));     // local port number use to bind SSH tunnel
-        int nRemotePort = Integer.parseInt(properties.getProperty("remote.port"));  // remote port number of your database 
-	
-        SSHTunnel tunnel = new SSHTunnel(strSshUser, strSshPassword, strSshHost, nSshPort, strRemoteHost, nLocalPort, nRemotePort);
-	    return tunnel;
-	}
-	
-	public static Connection createDBConnection(int tunnelPort) throws ClassNotFoundException, SQLException
+	public static Connection createDBConnection() throws ClassNotFoundException, SQLException
 	{
 		String strDbUser = properties.getProperty("jdbc.username");        // database login username
         String strDbPassword = properties.getProperty("jdbc.password");    // database login password
-        int nLocalPort = Integer.parseInt(properties.getProperty("local.port"));     // local port nu	
+        String remoteHost = properties.getProperty("remote.host");     // local port nu	
+        String remotePort = properties.getProperty("remote.port");     // local port nu	
         Connection con;
         
         System.out.println("Trying connection ");
@@ -63,7 +49,7 @@ public class JdbcExample {
 		Class.forName("org.postgresql.Driver");
 //    	Class.forName("com.mysql.jdbc.Driver");
 //        con = DriverManager.getConnection("jdbc:mysql://127.0.0.1:"+tunnelPort+"/cos420?user="+strDbUser+"&password="+strDbPassword);
-		  con = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:" + tunnelPort+ "/clinic", strDbUser,strDbPassword);
+		  con = DriverManager.getConnection("jdbc:postgresql://" + remoteHost +":" + remotePort + "/clinic", strDbUser,strDbPassword);
 
     	if(!con.isClosed())
           System.out.println("Successfully connected to Postgres server using TCP/IP...");
@@ -141,7 +127,6 @@ public class JdbcExample {
 	public static void main(String[] args) 
 	{
 
-		SSHTunnel tunnel = null;
 		Connection con = null;
 
 		loadProps();
@@ -150,10 +135,10 @@ public class JdbcExample {
 		
 		try {
 
-			tunnel = createTunnelFromProperties();
-			int tunnelPort = tunnel.doSshTunnel();
+//			tunnel = createTunnelFromProperties();
+//			int tunnelPort = tunnel.doSshTunnel();
 
-			con = createDBConnection(tunnelPort);
+			con = createDBConnection();
 			emptyNursesTable(con);
 			addToNursesTable(con);
             displayNursesTable(con);
@@ -166,8 +151,6 @@ public class JdbcExample {
 					con.close();
 			} catch (SQLException e) {
 			}
-			if (tunnel != null)
-				tunnel.closeSession();
 		}
 	}
 }
