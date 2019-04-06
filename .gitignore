@@ -46,7 +46,8 @@ tmp/**/*
 *.bak
 *.swp
 *~.nib
- .settings
+.settings/* 
+.settings
 .classpath
 .project
 
